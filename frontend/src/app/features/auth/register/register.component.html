@@ -1,0 +1,37 @@
+<section class="auth-page page-shell">
+  <div class="auth-panel register-panel card">
+    <div class="auth-copy">
+      <span class="pill">Nova conta</span>
+      <h1>Monte sua base e comece a jogar.</h1>
+      <p>Crie sua conta para acompanhar partidas, registrar tentativas e evoluir o MVP do Mastermind.</p>
+    </div>
+
+    <form class="auth-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="field">
+        <label for="full_name">Nome completo</label>
+        <input id="full_name" type="text" formControlName="full_name" placeholder="Seu nome" />
+      </div>
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" type="email" formControlName="email" placeholder="voce@email.com" />
+      </div>
+
+      <div class="field">
+        <label for="password">Senha</label>
+        <input id="password" type="password" formControlName="password" placeholder="Min. 6 caracteres" />
+      </div>
+
+      <p class="helper-error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+      <button class="button-secondary" type="submit" [disabled]="isLoading">
+        {{ isLoading ? 'Criando...' : 'Criar conta' }}
+      </button>
+
+      <p class="auth-link">
+        Já tem conta?
+        <a routerLink="/login">Entrar</a>
+      </p>
+    </form>
+  </div>
+</section>

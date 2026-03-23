@@ -1,0 +1,32 @@
+<section class="auth-page page-shell">
+  <div class="auth-panel card">
+    <div class="auth-copy">
+      <span class="pill">Mastermind</span>
+      <h1>Entre e volte para a partida.</h1>
+      <p>Faça login para iniciar novos jogos, acompanhar seu histórico e testar sua lógica rodada após rodada.</p>
+    </div>
+
+    <form class="auth-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" type="email" formControlName="email" placeholder="voce@email.com" />
+      </div>
+
+      <div class="field">
+        <label for="password">Senha</label>
+        <input id="password" type="password" formControlName="password" placeholder="Sua senha" />
+      </div>
+
+      <p class="helper-error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+      <button class="button-primary" type="submit" [disabled]="isLoading">
+        {{ isLoading ? 'Entrando...' : 'Entrar' }}
+      </button>
+
+      <p class="auth-link">
+        Ainda não tem conta?
+        <a routerLink="/register">Criar conta</a>
+      </p>
+    </form>
+  </div>
+</section>

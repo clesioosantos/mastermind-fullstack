@@ -16,6 +16,9 @@ __pycache__/
 .venv/
 *.db
 
+# Angular
+.angular/
+
 # Editor
 .vscode/
 .DS_Store

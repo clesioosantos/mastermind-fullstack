@@ -1,0 +1,27 @@
+{
+  "name": "mastermind-frontend",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "npx ng serve",
+    "build": "npx ng build",
+    "test": "npx ng test"
+  },
+  "dependencies": {
+    "@angular/common": "^17.3.0",
+    "@angular/compiler": "^17.3.0",
+    "@angular/core": "^17.3.0",
+    "@angular/forms": "^17.3.0",
+    "@angular/platform-browser": "^17.3.0",
+    "@angular/router": "^17.3.0",
+    "rxjs": "^7.8.1",
+    "tslib": "^2.8.1",
+    "zone.js": "^0.14.4"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^17.3.0",
+    "@angular/cli": "^17.3.0",
+    "@angular/compiler-cli": "^17.3.0",
+    "typescript": "~5.4.5"
+  }
+}

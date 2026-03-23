@@ -1,0 +1,271 @@
+.game-header {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 24px;
+  padding: 28px 32px;
+  align-items: center;
+}
+
+.game-header h1 {
+  margin: 14px 0 10px;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  line-height: 0.95;
+}
+
+.game-header p {
+  margin: 0;
+  color: var(--muted);
+  max-width: 56ch;
+}
+
+.header-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.game-layout {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 20px;
+}
+
+.board-card,
+.status-card,
+.loading-card {
+  padding: 24px;
+}
+
+.board-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 20px;
+  margin-bottom: 18px;
+}
+
+.board-top h2 {
+  margin: 12px 0 0;
+  font-size: 1.8rem;
+}
+
+.board-summary {
+  display: grid;
+  gap: 8px;
+  text-align: right;
+  color: var(--muted);
+}
+
+.secret-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 14px 18px;
+  border-radius: 20px;
+  background: rgba(29, 36, 51, 0.06);
+  margin-bottom: 16px;
+}
+
+.secret-label {
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.secret-pegs,
+.guess-pegs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.secret-peg,
+.peg {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(29, 36, 51, 0.2);
+  font-weight: 800;
+}
+
+.secret-peg {
+  background: linear-gradient(145deg, #2f3649, #1a1f2d);
+  color: #fff;
+}
+
+.peg-empty {
+  background: #fff;
+  color: rgba(29, 36, 51, 0.34);
+}
+
+.peg-red {
+  background: #e05d53;
+  color: #fff;
+}
+
+.peg-green {
+  background: #2e9d6d;
+  color: #fff;
+}
+
+.peg-blue {
+  background: #3d78d8;
+  color: #fff;
+}
+
+.peg-yellow {
+  background: #e8bc3d;
+  color: #3c2e04;
+}
+
+.peg-orange {
+  background: #eb8744;
+  color: #fff;
+}
+
+.peg-purple {
+  background: #7b58c4;
+  color: #fff;
+}
+
+.board-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.board-row {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) 88px;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.row-label {
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  align-items: center;
+  justify-content: center;
+  background: rgba(61, 120, 216, 0.14);
+  color: #315fbc;
+  font-weight: 800;
+}
+
+.feedback-pegs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.feedback-peg {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1px solid rgba(29, 36, 51, 0.18);
+  background: rgba(29, 36, 51, 0.06);
+}
+
+.feedback-hit {
+  background: #1f2736;
+  border-color: #1f2736;
+}
+
+.panel-copy {
+  margin: 0 0 20px;
+  color: var(--muted);
+}
+
+.guess-form {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.legend {
+  margin-bottom: 24px;
+}
+
+.legend h3,
+.history-summary h3 {
+  margin: 0 0 12px;
+}
+
+.legend-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 12px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+}
+
+.legend-item .peg {
+  width: 32px;
+  height: 32px;
+  font-style: normal;
+  font-size: 0.9rem;
+}
+
+.history-summary {
+  margin-bottom: 24px;
+}
+
+.history-summary p {
+  margin: 0;
+  color: var(--muted);
+}
+
+@media (max-width: 960px) {
+  .game-header,
+  .game-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .header-actions {
+    justify-content: flex-start;
+  }
+
+  .board-top,
+  .secret-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 640px) {
+  .board-row {
+    grid-template-columns: 30px minmax(0, 1fr);
+  }
+
+  .feedback-pegs {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .legend-grid {
+    grid-template-columns: 1fr;
+  }
+}

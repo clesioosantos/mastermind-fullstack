@@ -1,0 +1,45 @@
+<section class="page-shell">
+  <header class="hero card">
+    <div>
+      <span class="pill">Dashboard</span>
+      <h1>Bem-vindo{{ user ? ', ' + user.full_name : '' }}.</h1>
+      <p>Seu backend já cria partidas, recebe tentativas e devolve histórico. Agora o frontend assume o controle do fluxo.</p>
+    </div>
+
+    <div class="hero-actions">
+      <button class="button-primary" type="button" (click)="createGame()" [disabled]="isLoading">
+        {{ isLoading ? 'Criando jogo...' : 'Novo jogo' }}
+      </button>
+      <button class="button-ghost" type="button" (click)="logout()">Sair</button>
+    </div>
+  </header>
+
+  <section class="home-grid">
+    <article class="info card">
+      <h2>Conta</h2>
+      <dl *ngIf="user; else noUser">
+        <div>
+          <dt>Email</dt>
+          <dd>{{ user.email }}</dd>
+        </div>
+        <div>
+          <dt>Status</dt>
+          <dd>{{ user.is_active ? 'Ativo' : 'Inativo' }}</dd>
+        </div>
+      </dl>
+      <ng-template #noUser>
+        <p class="empty-state">Nenhum usuário encontrado no armazenamento local.</p>
+      </ng-template>
+    </article>
+
+    <article class="tips card">
+      <h2>Fluxo do MVP</h2>
+      <ol>
+        <li>Crie um novo jogo.</li>
+        <li>Abra a tela da partida pelo código recebido.</li>
+        <li>Envie palpites com 4 cores entre R, G, B, Y, O e P.</li>
+      </ol>
+      <p class="helper-error" *ngIf="errorMessage">{{ errorMessage }}</p>
+    </article>
+  </section>
+</section>
