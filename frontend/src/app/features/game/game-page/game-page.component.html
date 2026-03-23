@@ -1,0 +1,115 @@
+<section class="page-shell">
+  <header class="game-header card">
+    <div>
+      <span class="pill">Partida {{ gameCode }}</span>
+      <h1>Quebre o codigo de 4 cores.</h1>
+      <p>Use apenas R, G, B, Y, O e P. Cada linha do tabuleiro mostra o historico da rodada e os acertos exatos.</p>
+    </div>
+
+    <div class="header-actions">
+      <a class="button-ghost nav-link" routerLink="/home">Voltar</a>
+      <button class="button-ghost" type="button" (click)="logout()">Sair</button>
+    </div>
+  </header>
+
+  <p class="helper-error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+  <div class="game-layout" *ngIf="!isLoading; else loadingState">
+    <section class="board-card card">
+      <div class="board-top">
+        <div>
+          <span class="pill">Tabuleiro</span>
+          <h2>Mastermind Board</h2>
+        </div>
+
+        <div class="board-summary" *ngIf="game">
+          <span>Tentativas restantes: <strong>{{ game.remaining_attempts }}</strong></span>
+          <span [class.status-win]="game.is_finished && game.is_won" [class.status-lose]="game.is_finished && !game.is_won">
+            {{ game.is_finished ? (game.is_won ? 'Vitoria' : 'Derrota') : 'Em andamento' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="secret-row">
+        <span class="secret-label">Codigo</span>
+        <div class="secret-pegs">
+          <span class="secret-peg">?</span>
+          <span class="secret-peg">?</span>
+          <span class="secret-peg">?</span>
+          <span class="secret-peg">?</span>
+        </div>
+      </div>
+
+      <div class="board-grid">
+        <article class="board-row" *ngFor="let rowNumber of boardRows">
+          <span class="row-label">{{ rowNumber }}</span>
+
+          <div class="guess-pegs">
+            <span
+              *ngFor="let peg of getGuessSlots(getAttemptForRow(rowNumber)?.guess)"
+              [class]="['peg', getPegClass(peg)].join(' ')"
+            >
+              {{ peg || '' }}
+            </span>
+          </div>
+
+          <div class="feedback-pegs">
+            <span
+              *ngFor="let filled of getFeedbackSlots(getAttemptForRow(rowNumber)?.correct_count)"
+              class="feedback-peg"
+              [class.feedback-hit]="filled"
+            ></span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="status-card card">
+      <h2>Sua jogada</h2>
+      <p class="panel-copy">Digite 4 letras usando apenas R, G, B, Y, O e P.</p>
+
+      <form class="guess-form" [formGroup]="form" (ngSubmit)="submitGuess()">
+        <div class="field">
+          <label for="guess">Palpite</label>
+          <input id="guess" type="text" maxlength="4" formControlName="guess" placeholder="Ex: RGBY" />
+        </div>
+
+        <button class="button-primary" type="submit" [disabled]="isSubmitting || game?.is_finished">
+          {{ isSubmitting ? 'Enviando...' : 'Enviar palpite' }}
+        </button>
+      </form>
+
+      <div class="legend">
+        <h3>Cores validas</h3>
+        <div class="legend-grid">
+          <span class="legend-item"><i class="peg peg-red">R</i> Vermelho</span>
+          <span class="legend-item"><i class="peg peg-green">G</i> Verde</span>
+          <span class="legend-item"><i class="peg peg-blue">B</i> Azul</span>
+          <span class="legend-item"><i class="peg peg-yellow">Y</i> Amarelo</span>
+          <span class="legend-item"><i class="peg peg-orange">O</i> Laranja</span>
+          <span class="legend-item"><i class="peg peg-purple">P</i> Roxo</span>
+        </div>
+      </div>
+
+      <div class="history-summary">
+        <h3>Historico rapido</h3>
+        <p *ngIf="attempts.length; else emptyAttempts">
+          {{ attempts.length }} tentativa(s) registrada(s). Ultimo acerto exato:
+          <strong>{{ attempts[attempts.length - 1].correct_count }}</strong>
+        </p>
+      </div>
+
+      <ng-template #emptyAttempts>
+        <p class="empty-state">Nenhuma tentativa ainda. Envie o primeiro palpite.</p>
+      </ng-template>
+
+      <button class="button-secondary" type="button" (click)="newGame()">Novo jogo</button>
+    </section>
+  </div>
+
+  <ng-template #loadingState>
+    <section class="card loading-card">
+      <p>Carregando partida...</p>
+    </section>
+  </ng-template>
+</section>
