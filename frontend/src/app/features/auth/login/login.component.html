@@ -1,12 +1,37 @@
 <section class="auth-page page-shell">
   <div class="auth-panel card">
     <div class="auth-copy">
-      <span class="pill">Mastermind</span>
-      <h1>Entre e volte para a partida.</h1>
-      <p>Faça login para iniciar novos jogos, acompanhar seu histórico e testar sua lógica rodada após rodada.</p>
+      <div class="copy-badge">
+        <span class="pill">Mastermind</span>
+        <strong>Arena de logica</strong>
+      </div>
+
+      <h1>Volte para o tabuleiro com ritmo de jogo.</h1>
+      <p>
+        Entre para iniciar novas partidas, acompanhar o ranking e manter seu historico
+        de performance em uma interface pensada para foco e leitura rapida.
+      </p>
+
+      <div class="auth-showcase">
+        <div class="showcase-pegs">
+          <span class="showcase-peg peg-red"></span>
+          <span class="showcase-peg peg-green"></span>
+          <span class="showcase-peg peg-blue"></span>
+          <span class="showcase-peg peg-yellow"></span>
+        </div>
+        <div class="showcase-note">
+          <strong>Desafio ativo</strong>
+          <span>4 cores, 10 rodadas e um unico codigo secreto.</span>
+        </div>
+      </div>
     </div>
 
     <form class="auth-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-head">
+        <h2>Entrar</h2>
+        <p>Use seu email e senha para seguir para o dashboard.</p>
+      </div>
+
       <div class="field">
         <label for="email">Email</label>
         <input id="email" type="email" formControlName="email" placeholder="voce@email.com" />
@@ -24,7 +49,7 @@
       </button>
 
       <p class="auth-link">
-        Ainda não tem conta?
+        Ainda nao tem conta?
         <a routerLink="/register">Criar conta</a>
       </p>
     </form>

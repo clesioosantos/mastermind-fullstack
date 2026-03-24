@@ -1,13 +1,16 @@
-<section class="page-shell">
-  <header class="game-header card">
-    <div>
+<section class="page-shell game-page">
+  <header class="game-hero card">
+    <div class="hero-copy">
       <span class="pill">Partida {{ gameCode }}</span>
-      <h1>Quebre o codigo de 4 cores.</h1>
-      <p>Use apenas R, G, B, Y, O e P. Cada linha do tabuleiro mostra o historico da rodada e os acertos exatos.</p>
+      <h1>Leia o tabuleiro, teste a logica e pressione o codigo.</h1>
+      <p>
+        O sistema responde apenas com acertos exatos. Sua vantagem vem da leitura das
+        tentativas anteriores e da disciplina entre uma rodada e outra.
+      </p>
     </div>
 
-    <div class="header-actions">
-      <a class="button-ghost nav-link" routerLink="/home">Voltar</a>
+    <div class="hero-actions">
+      <button class="button-ghost" type="button" (click)="goHome()">Voltar</button>
       <button class="button-ghost" type="button" (click)="logout()">Sair</button>
     </div>
   </header>
@@ -19,19 +22,28 @@
       <div class="board-top">
         <div>
           <span class="pill">Tabuleiro</span>
-          <h2>Mastermind Board</h2>
+          <h2>Console de rodada</h2>
         </div>
 
-        <div class="board-summary" *ngIf="game">
-          <span>Tentativas restantes: <strong>{{ game.remaining_attempts }}</strong></span>
-          <span [class.status-win]="game.is_finished && game.is_won" [class.status-lose]="game.is_finished && !game.is_won">
-            {{ game.is_finished ? (game.is_won ? 'Vitoria' : 'Derrota') : 'Em andamento' }}
-          </span>
+        <div class="board-status" *ngIf="game">
+          <div class="status-chip">
+            <small>Tentativas restantes</small>
+            <strong>{{ game.remaining_attempts }}</strong>
+          </div>
+          <div class="status-chip">
+            <small>Status</small>
+            <strong [class.status-win]="game.is_finished && game.is_won" [class.status-lose]="game.is_finished && !game.is_won">
+              {{ game.is_finished ? (game.is_won ? 'Vitoria' : 'Derrota') : 'Em andamento' }}
+            </strong>
+          </div>
         </div>
       </div>
 
       <div class="secret-row">
-        <span class="secret-label">Codigo</span>
+        <div>
+          <span class="secret-label">Codigo escondido</span>
+          <p>Quatro cores, uma unica sequencia correta.</p>
+        </div>
         <div class="secret-pegs">
           <span class="secret-peg">?</span>
           <span class="secret-peg">?</span>
@@ -42,9 +54,9 @@
 
       <div class="board-grid">
         <article class="board-row" *ngFor="let rowNumber of boardRows">
-          <span class="row-label">{{ rowNumber }}</span>
+          <span class="row-label" [class.row-label-active]="rowNumber === 10 && attempts.length > 0">{{ rowNumber }}</span>
 
-          <div class="guess-pegs">
+          <div class="guess-pegs" [class.guess-pegs-last]="rowNumber === 10 && attempts.length > 0">
             <span
               *ngFor="let peg of getGuessSlots(getAttemptForRow(rowNumber)?.guess)"
               [class]="['peg', getPegClass(peg)].join(' ')"
@@ -53,7 +65,7 @@
             </span>
           </div>
 
-          <div class="feedback-pegs">
+          <div class="feedback-panel">
             <span
               *ngFor="let filled of getFeedbackSlots(getAttemptForRow(rowNumber)?.correct_count)"
               class="feedback-peg"
@@ -64,14 +76,32 @@
       </div>
     </section>
 
-    <section class="status-card card">
-      <h2>Sua jogada</h2>
-      <p class="panel-copy">Digite 4 letras usando apenas R, G, B, Y, O e P.</p>
+    <aside class="control-card card">
+      <div class="control-head">
+        <span class="pill">Painel</span>
+        <h2>Sua jogada</h2>
+        <p>Digite 4 letras usando apenas R, G, B, Y, O e P.</p>
+      </div>
+
+      <div class="result-banner result-win" *ngIf="game?.is_finished && game?.is_won">
+        Voce venceu! O codigo caiu dentro do limite.
+      </div>
+
+      <div class="result-banner result-lose" *ngIf="game?.is_finished && !game?.is_won">
+        Voce perdeu. Hora de abrir uma nova rodada.
+      </div>
 
       <form class="guess-form" [formGroup]="form" (ngSubmit)="submitGuess()">
         <div class="field">
           <label for="guess">Palpite</label>
-          <input id="guess" type="text" maxlength="4" formControlName="guess" placeholder="Ex: RGBY" />
+          <input
+            id="guess"
+            type="text"
+            maxlength="4"
+            formControlName="guess"
+            placeholder="Ex: RGBY"
+            [disabled]="!!game?.is_finished"
+          />
         </div>
 
         <button class="button-primary" type="submit" [disabled]="isSubmitting || game?.is_finished">
@@ -79,8 +109,19 @@
         </button>
       </form>
 
+      <div class="control-stats">
+        <div class="mini-stat">
+          <small>Tentativas usadas</small>
+          <strong>{{ attemptsUsed }}/10</strong>
+        </div>
+        <div class="mini-stat">
+          <small>Ultimo acerto</small>
+          <strong>{{ latestAttempt?.correct_count ?? 0 }}</strong>
+        </div>
+      </div>
+
       <div class="legend">
-        <h3>Cores validas</h3>
+        <h3>Paleta valida</h3>
         <div class="legend-grid">
           <span class="legend-item"><i class="peg peg-red">R</i> Vermelho</span>
           <span class="legend-item"><i class="peg peg-green">G</i> Verde</span>
@@ -92,19 +133,19 @@
       </div>
 
       <div class="history-summary">
-        <h3>Historico rapido</h3>
+        <h3>Leitura rapida</h3>
         <p *ngIf="attempts.length; else emptyAttempts">
-          {{ attempts.length }} tentativa(s) registrada(s). Ultimo acerto exato:
-          <strong>{{ attempts[attempts.length - 1].correct_count }}</strong>
+          A jogada mais recente rendeu <strong>{{ latestAttempt?.correct_count }}</strong> acerto(s)
+          exato(s). Use essa pista para decidir o proximo movimento.
         </p>
       </div>
 
       <ng-template #emptyAttempts>
-        <p class="empty-state">Nenhuma tentativa ainda. Envie o primeiro palpite.</p>
+        <p class="empty-state">Nenhuma tentativa ainda. O tabuleiro esta limpo para a primeira leitura.</p>
       </ng-template>
 
-      <button class="button-secondary" type="button" (click)="newGame()">Novo jogo</button>
-    </section>
+      <button class="button-secondary" type="button" (click)="newGame()" [disabled]="isSubmitting">Novo jogo</button>
+    </aside>
   </div>
 
   <ng-template #loadingState>

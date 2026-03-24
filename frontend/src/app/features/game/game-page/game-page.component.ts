@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { AttemptResponse, GameResponse } from '../../../core/models/game.models';
 import { AuthService } from '../../../core/services/auth.service';
@@ -21,11 +22,13 @@ export class GamePageComponent {
   private fb = inject(FormBuilder);
   private gameService = inject(GameService);
   private authService = inject(AuthService);
+  private destroyRef = inject(DestroyRef);
 
-  gameCode = this.route.snapshot.paramMap.get('code') ?? '';
+  gameCode = '';
   game: GameResponse | null = null;
   attempts: AttemptResponse[] = [];
   boardRows = Array.from({ length: 10 }, (_, index) => 10 - index);
+  readonly validColors = ['R', 'G', 'B', 'Y', 'O', 'P'];
   isLoading = true;
   isSubmitting = false;
   errorMessage = '';
@@ -34,8 +37,22 @@ export class GamePageComponent {
     guess: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(4)]]
   });
 
+  get latestAttempt(): AttemptResponse | null {
+    return this.attempts[0] ?? null;
+  }
+
+  get attemptsUsed(): number {
+    return this.attempts.length;
+  }
+
   ngOnInit(): void {
-    this.loadGameData();
+    this.route.paramMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        this.gameCode = params.get('code') ?? '';
+        this.resetViewState();
+        this.loadGameData();
+      });
   }
 
   loadGameData(): void {
@@ -54,7 +71,7 @@ export class GamePageComponent {
     }).subscribe({
       next: ({ game, attempts }) => {
         this.game = game;
-        this.attempts = attempts;
+        this.attempts = [...attempts].reverse();
         this.isLoading = false;
       },
       error: () => {
@@ -64,30 +81,47 @@ export class GamePageComponent {
     });
   }
 
+  private resetViewState(): void {
+    this.game = null;
+    this.attempts = [];
+    this.errorMessage = '';
+    this.isLoading = true;
+    this.form.reset();
+  }
+
   submitGuess(): void {
     if (this.form.invalid || !this.gameCode || this.game?.is_finished) {
       this.form.markAllAsTouched();
       return;
     }
 
-    this.isSubmitting = true;
     this.errorMessage = '';
 
-    const guess = this.form.controls.guess.getRawValue().toUpperCase();
+    const guess = this.form.controls.guess.getRawValue().trim().toUpperCase();
+
+    if (guess.length !== 4) {
+      this.errorMessage = 'Digite exatamente 4 letras.';
+      return;
+    }
+
+    if ([...guess].some((color) => !this.validColors.includes(color))) {
+      this.errorMessage = 'Use apenas R, G, B, Y, O e P.';
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.form.controls.guess.setValue(guess);
 
     this.gameService.makeGuess(this.gameCode, { guess }).subscribe({
-      next: (response) => {
-        this.game = {
-          code: this.gameCode,
-          remaining_attempts: response.remaining_attempts,
-          is_finished: response.is_finished,
-          is_won: response.is_won
-        };
+      next: () => {
         this.form.reset();
-        this.loadAttemptsOnly();
+        this.loadGameData();
       },
       error: (error) => {
-        this.errorMessage = error?.error?.detail ?? 'Nao foi possivel enviar o palpite.';
+        this.errorMessage =
+          error?.error?.message ??
+          error?.error?.detail ??
+          'Nao foi possivel enviar o palpite.';
         this.isSubmitting = false;
       },
       complete: () => {
@@ -96,16 +130,8 @@ export class GamePageComponent {
     });
   }
 
-  private loadAttemptsOnly(): void {
-    this.gameService.getAttempts(this.gameCode).subscribe({
-      next: (attempts) => {
-        this.attempts = attempts;
-      }
-    });
-  }
-
   getAttemptForRow(rowNumber: number): AttemptResponse | undefined {
-    return this.attempts[rowNumber - 1];
+    return this.attempts[10 - rowNumber];
   }
 
   getGuessSlots(guess: string | undefined): string[] {
@@ -132,6 +158,24 @@ export class GamePageComponent {
   }
 
   newGame(): void {
+    this.isSubmitting = true;
+    this.errorMessage = '';
+
+    this.gameService.createGame().subscribe({
+      next: (game) => {
+        this.router.navigate(['/games', game.code]);
+      },
+      error: () => {
+        this.errorMessage = 'Nao foi possivel criar um novo jogo.';
+        this.isSubmitting = false;
+      },
+      complete: () => {
+        this.isSubmitting = false;
+      }
+    });
+  }
+
+  goHome(): void {
     this.router.navigate(['/home']);
   }
 

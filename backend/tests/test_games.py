@@ -57,6 +57,8 @@ def test_create_game_requires_auth_and_returns_public_fields_only():
     assert body["remaining_attempts"] == 10
     assert body["is_finished"] is False
     assert body["is_won"] is False
+    assert body["final_score"] == 0
+    assert body["duration_seconds"] == 0
     assert "secret_code" not in body
 
 
@@ -173,6 +175,7 @@ def test_get_game_and_list_attempts_returns_history_for_owner():
     assert game_body["remaining_attempts"] == 9
     assert game_body["is_finished"] is False
     assert game_body["is_won"] is False
+    assert game_body["final_score"] == 0
 
     attempts_response = client.get(
         f"/api/games/{game_code}/attempts",
@@ -184,3 +187,74 @@ def test_get_game_and_list_attempts_returns_history_for_owner():
     assert len(attempts_body) == 1
     assert attempts_body[0]["guess"] == "RRRR"
     assert attempts_body[0]["correct_count"] == 1
+
+
+def test_ranking_returns_players_ordered_by_best_score():
+    register_response = client.post(
+        "/api/auth/register",
+        json={
+            "email": "ranker@example.com",
+            "full_name": "Ranker Player",
+            "password": "secret123",
+        },
+    )
+
+    assert register_response.status_code == 201
+
+    login_response = client.post(
+        "/api/auth/login",
+        json={
+            "email": "ranker@example.com",
+            "password": "secret123",
+        },
+    )
+
+    assert login_response.status_code == 200
+    token = login_response.json()["access_token"]
+
+    create_response = client.post(
+        "/api/games",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert create_response.status_code == 201
+    game_code = create_response.json()["code"]
+
+    db = SessionLocal()
+    try:
+        game = db.query(Game).filter(Game.code == game_code).first()
+        assert game is not None
+        game.secret_code = "RGBY"
+        db.commit()
+    finally:
+        db.close()
+
+    guess_response = client.post(
+        f"/api/games/{game_code}/guess",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"guess": "RGBY"},
+    )
+
+    assert guess_response.status_code == 200
+
+    game_response = client.get(
+        f"/api/games/{game_code}",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert game_response.status_code == 200
+    assert game_response.json()["final_score"] > 0
+    assert game_response.json()["duration_seconds"] >= 0
+
+    ranking_response = client.get(
+        "/api/games/ranking/list",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert ranking_response.status_code == 200
+    ranking_body = ranking_response.json()
+    assert len(ranking_body) >= 1
+    ranker_entry = next((entry for entry in ranking_body if entry["email"] == "ranker@example.com"), None)
+    assert ranker_entry is not None
+    assert ranker_entry["best_score"] > 0
+    assert ranker_entry["wins"] >= 1

@@ -22,6 +22,10 @@ export class HomeComponent {
   isLoading = false;
   errorMessage = '';
 
+  get firstName(): string {
+    return this.user?.full_name?.split(' ')[0] ?? 'Jogador';
+  }
+
   createGame(): void {
     this.isLoading = true;
     this.errorMessage = '';
@@ -31,7 +35,7 @@ export class HomeComponent {
         this.router.navigate(['/games', game.code]);
       },
       error: () => {
-        this.errorMessage = 'Não foi possível criar um novo jogo.';
+        this.errorMessage = 'Nao foi possivel criar um novo jogo.';
         this.isLoading = false;
       },
       complete: () => {
@@ -43,5 +47,9 @@ export class HomeComponent {
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
+  }
+
+  goToRanking(): void {
+    this.router.navigate(['/ranking']);
   }
 }

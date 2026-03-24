@@ -6,6 +6,7 @@ from app.core.exceptions import UnauthorizedException
 from app.core.security import decode_access_token
 from app.db.session import get_db
 from app.models.user import User
+from app.repositories.user_repository import UserRepository
 
 bearer_scheme = HTTPBearer(auto_error=False)
 
@@ -23,7 +24,8 @@ def get_current_user(
     if not user_id:
         raise UnauthorizedException("Invalid token")
 
-    user = db.query(User).filter(User.id == int(user_id)).first()
+    user_repository = UserRepository(db)
+    user = user_repository.get_by_id(int(user_id))
 
     if not user:
         raise UnauthorizedException("User not found")

@@ -1,0 +1,79 @@
+<section class="page-shell ranking-page">
+  <header class="ranking-hero card">
+    <div>
+      <span class="pill">Ranking</span>
+      <h1>Quem esta dominando o tabuleiro agora.</h1>
+      <p>
+        O placar combina melhor score, numero de vitorias e consistencia geral para
+        mostrar quem vem lendo melhor o jogo.
+      </p>
+    </div>
+
+    <div class="hero-actions">
+      <button class="button-ghost" type="button" (click)="goHome()">Voltar</button>
+      <button class="button-ghost" type="button" (click)="logout()">Sair</button>
+    </div>
+  </header>
+
+  <p class="helper-error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+  <section class="ranking-content" *ngIf="!isLoading; else loadingState">
+    <article class="card podium-card" *ngIf="ranking.length">
+      <div class="podium-head">
+        <span class="pill">Top 3</span>
+        <h2>Destaques da rodada</h2>
+      </div>
+
+      <div class="podium-grid">
+        <div class="podium-item" *ngFor="let entry of ranking.slice(0, 3); let index = index" [class.first]="index === 0">
+          <span class="podium-rank">{{ index + 1 }}</span>
+          <strong>{{ entry.full_name }}</strong>
+          <small>{{ entry.email }}</small>
+          <div class="podium-meta">
+            <span>{{ entry.best_score }} pts</span>
+            <span>{{ entry.wins }} vitorias</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <section class="card ranking-table-card">
+      <div class="ranking-table" *ngIf="ranking.length; else emptyState">
+        <div class="ranking-row ranking-head">
+          <span>#</span>
+          <span>Jogador</span>
+          <span>Partidas</span>
+          <span>Vitorias</span>
+          <span>Melhor score</span>
+        </div>
+
+        <div
+          class="ranking-row"
+          *ngFor="let entry of ranking; let index = index"
+          [class.rank-highlight]="index < 3"
+        >
+          <span class="rank-position" [class.rank-top]="index === 0" [class.rank-mid]="index === 1" [class.rank-third]="index === 2">
+            {{ index + 1 }}
+          </span>
+          <div class="player-meta">
+            <strong>{{ entry.full_name }}</strong>
+            <small>{{ entry.email }}</small>
+          </div>
+          <span>{{ entry.games_played }}</span>
+          <span>{{ entry.wins }}</span>
+          <strong>{{ entry.best_score }}</strong>
+        </div>
+      </div>
+
+      <ng-template #emptyState>
+        <p class="empty-state">Nenhuma partida registrada ainda.</p>
+      </ng-template>
+    </section>
+  </section>
+
+  <ng-template #loadingState>
+    <section class="card ranking-table-card">
+      <p>Carregando ranking...</p>
+    </section>
+  </ng-template>
+</section>

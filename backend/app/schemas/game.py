@@ -8,3 +8,5 @@ class GameCreateResponse(BaseModel):
     remaining_attempts: int
     is_finished: bool
     is_won: bool
+    final_score: int
+    duration_seconds: int

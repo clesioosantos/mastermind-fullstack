@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { AttemptResponse, GameResponse, GuessRequest, GuessResponse } from '../models/game.models';
+import { AttemptResponse, GameResponse, GuessRequest, GuessResponse, RankingEntryResponse } from '../models/game.models';
 
 @Injectable({
   providedIn: 'root'
@@ -26,5 +26,9 @@ export class GameService {
 
   getAttempts(code: string): Observable<AttemptResponse[]> {
     return this.http.get<AttemptResponse[]>(`${this.apiUrl}/${code}/attempts`);
+  }
+
+  getRanking(): Observable<RankingEntryResponse[]> {
+    return this.http.get<RankingEntryResponse[]>(`${this.apiUrl}/ranking/list`);
   }
 }

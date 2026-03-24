@@ -3,15 +3,17 @@ from sqlalchemy.orm import Session
 from app.core.exceptions import ConflictException, UnauthorizedException
 from app.core.security import create_access_token, hash_password, verify_password
 from app.models.user import User
+from app.repositories.user_repository import UserRepository
 from app.schemas.auth import UserLoginRequest, UserRegisterRequest
 
 
 class AuthService:
     def __init__(self, db: Session):
         self.db = db
+        self.user_repository = UserRepository(db)
 
     def register(self, payload: UserRegisterRequest):
-        existing_user = self.db.query(User).filter(User.email == payload.email).first()
+        existing_user = self.user_repository.get_by_email(payload.email)
         if existing_user:
             raise ConflictException("Email already registered")
 
@@ -22,14 +24,10 @@ class AuthService:
             is_active=True,
         )
 
-        self.db.add(user)
-        self.db.commit()
-        self.db.refresh(user)
-
-        return user
+        return self.user_repository.create(user)
 
     def login(self, payload: UserLoginRequest):
-        user = self.db.query(User).filter(User.email == payload.email).first()
+        user = self.user_repository.get_by_email(payload.email)
 
         if not user or not verify_password(payload.password, user.hashed_password):
             raise UnauthorizedException("Invalid credentials")

@@ -1,45 +1,137 @@
-<section class="page-shell">
-  <header class="hero card">
-    <div>
+<section class="page-shell dashboard-page">
+  <header class="dashboard-hero card">
+    <div class="hero-copy">
       <span class="pill">Dashboard</span>
-      <h1>Bem-vindo{{ user ? ', ' + user.full_name : '' }}.</h1>
-      <p>Seu backend já cria partidas, recebe tentativas e devolve histórico. Agora o frontend assume o controle do fluxo.</p>
+      <h1>{{ firstName }}, a proxima jogada comeca aqui.</h1>
+      <p>
+        Inicie uma nova rodada, acompanhe o ranking e volte para o tabuleiro com uma
+        experiencia mais clara, responsiva e focada em decisao.
+      </p>
+
+      <div class="hero-actions">
+        <button class="button-primary" type="button" (click)="createGame()" [disabled]="isLoading">
+          {{ isLoading ? 'Gerando partida...' : 'Novo jogo' }}
+        </button>
+        <button class="button-secondary" type="button" (click)="goToRanking()">Ver ranking</button>
+        <button class="button-ghost" type="button" (click)="logout()">Sair</button>
+      </div>
+
+      <p class="helper-error" *ngIf="errorMessage">{{ errorMessage }}</p>
     </div>
 
-    <div class="hero-actions">
-      <button class="button-primary" type="button" (click)="createGame()" [disabled]="isLoading">
-        {{ isLoading ? 'Criando jogo...' : 'Novo jogo' }}
-      </button>
-      <button class="button-ghost" type="button" (click)="logout()">Sair</button>
+    <div class="hero-preview">
+      <div class="preview-card">
+        <span class="preview-label">Painel rapido</span>
+        <div class="preview-pegs">
+          <span class="preview-peg peg-red"></span>
+          <span class="preview-peg peg-green"></span>
+          <span class="preview-peg peg-blue"></span>
+          <span class="preview-peg peg-yellow"></span>
+        </div>
+        <div class="preview-stats">
+          <div>
+            <small>Usuario</small>
+            <strong>{{ user?.full_name || 'Nao identificado' }}</strong>
+          </div>
+          <div>
+            <small>Status</small>
+            <strong>{{ user?.is_active ? 'Pronto para jogar' : 'Conta inativa' }}</strong>
+          </div>
+        </div>
+      </div>
     </div>
   </header>
 
-  <section class="home-grid">
-    <article class="info card">
-      <h2>Conta</h2>
-      <dl *ngIf="user; else noUser">
-        <div>
-          <dt>Email</dt>
-          <dd>{{ user.email }}</dd>
+  <section class="dashboard-grid">
+    <article class="card spotlight-card">
+      <div class="section-top">
+        <span class="pill">Conta</span>
+        <strong class="spotlight-tag">Sessao ativa</strong>
+      </div>
+
+      <h2>Seu perfil de jogador</h2>
+
+      <div class="profile-grid" *ngIf="user; else noUser">
+        <div class="profile-item">
+          <small>Nome</small>
+          <strong>{{ user.full_name }}</strong>
         </div>
-        <div>
-          <dt>Status</dt>
-          <dd>{{ user.is_active ? 'Ativo' : 'Inativo' }}</dd>
+        <div class="profile-item">
+          <small>Email</small>
+          <strong>{{ user.email }}</strong>
         </div>
-      </dl>
+        <div class="profile-item">
+          <small>Conta</small>
+          <strong>{{ user.is_active ? 'Ativa' : 'Inativa' }}</strong>
+        </div>
+        <div class="profile-item">
+          <small>Proximo passo</small>
+          <strong>Comecar uma nova rodada</strong>
+        </div>
+      </div>
+
       <ng-template #noUser>
-        <p class="empty-state">Nenhum usuário encontrado no armazenamento local.</p>
+        <p class="empty-state">Nenhum usuario encontrado no armazenamento local.</p>
       </ng-template>
     </article>
 
-    <article class="tips card">
-      <h2>Fluxo do MVP</h2>
-      <ol>
-        <li>Crie um novo jogo.</li>
-        <li>Abra a tela da partida pelo código recebido.</li>
-        <li>Envie palpites com 4 cores entre R, G, B, Y, O e P.</li>
-      </ol>
-      <p class="helper-error" *ngIf="errorMessage">{{ errorMessage }}</p>
+    <article class="card command-card">
+      <div class="section-top">
+        <span class="pill">Fluxo</span>
+        <strong class="spotlight-tag warm">MVP funcional</strong>
+      </div>
+
+      <h2>Como a experiencia funciona</h2>
+
+      <div class="command-list">
+        <div class="command-item">
+          <span>01</span>
+          <div>
+            <strong>Inicie uma partida</strong>
+            <p>O backend gera um codigo unico e o segredo da rodada.</p>
+          </div>
+        </div>
+        <div class="command-item">
+          <span>02</span>
+          <div>
+            <strong>Envie palpites</strong>
+            <p>Use apenas R, G, B, Y, O e P para tentar quebrar a combinacao.</p>
+          </div>
+        </div>
+        <div class="command-item">
+          <span>03</span>
+          <div>
+            <strong>Acompanhe o desempenho</strong>
+            <p>O historico e o ranking ajudam a medir consistencia e score.</p>
+          </div>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="dashboard-lower">
+    <article class="card feature-band">
+      <div class="feature">
+        <span class="feature-badge">10</span>
+        <div>
+          <h3>Tentativas maximas</h3>
+          <p>Espaco suficiente para testar estrategia sem perder o ritmo da rodada.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <span class="feature-badge accent">4</span>
+        <div>
+          <h3>Pinos por codigo</h3>
+          <p>Interface desenhada para leitura rapida da matriz e dos acertos exatos.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <span class="feature-badge cool">24</span>
+        <div>
+          <h3>Combinacoes de cor</h3>
+          <p>Seis cores validas sustentam partidas curtas, mas ainda interessantes.</p>
+        </div>
+      </div>
     </article>
   </section>
 </section>
