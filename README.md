@@ -202,13 +202,36 @@ O ranking e ordenado por:
 - Alembic para migracoes formais em vez de `create_all`
 - Testes de interface mais amplos no frontend
 
-## Evidencias visuais
+## Demonstracao visual
 
-Sugestao para entrega final:
+Fluxos principais do MVP em execucao local.
 
-- incluir prints da tela de login
-- dashboard
-- jogo em andamento
-- ranking
+### Login
 
-Se quiser, voce pode complementar este README com GIFs ou screenshots antes de enviar o repositorio.
+Tela de autenticacao com validacao e redirecionamento para o dashboard.
+
+![Login](docs/assets/login.gif)
+
+### Registro
+
+Criacao de conta para novo jogador.
+
+![Registro](docs/assets/register.gif)
+
+### Dashboard
+
+Painel inicial com acesso rapido para nova partida e ranking.
+
+![Dashboard](docs/assets/dashboard.gif)
+
+### Jogo em andamento
+
+Tabuleiro visual estilo Mastermind com envio de palpites e feedback por rodada.
+
+![Gameplay](docs/assets/gameplay.gif)
+
+### Ranking
+
+Listagem ordenada por melhor score e desempenho dos jogadores.
+
+![Ranking](docs/assets/ranking.gif)

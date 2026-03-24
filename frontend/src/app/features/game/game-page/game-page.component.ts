@@ -55,14 +55,17 @@ export class GamePageComponent {
       });
   }
 
-  loadGameData(): void {
+  loadGameData(showLoadingState = true): void {
     if (!this.gameCode) {
       this.errorMessage = 'Codigo do jogo nao encontrado.';
       this.isLoading = false;
       return;
     }
 
-    this.isLoading = true;
+    if (showLoadingState) {
+      this.isLoading = true;
+    }
+
     this.errorMessage = '';
 
     forkJoin({
@@ -115,7 +118,7 @@ export class GamePageComponent {
     this.gameService.makeGuess(this.gameCode, { guess }).subscribe({
       next: () => {
         this.form.reset();
-        this.loadGameData();
+        this.loadGameData(false);
       },
       error: (error) => {
         this.errorMessage =
